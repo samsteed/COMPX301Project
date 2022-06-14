@@ -6,9 +6,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Size;
 
 public class RetinalMatch {
-    public static void main(String[] args){
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Mat src=Imgcodecs.imread("RIDB/RIDB/IM000001_1.jpg");
+        Mat src=Imgcodecs.imread("RIDB/RIDB/IM000001_2.jpg");
         Mat dst=new Mat();
         Mat gray = new Mat();
         Mat edges = new Mat();
@@ -17,26 +16,40 @@ public class RetinalMatch {
         //Imgproc.cvtColor(dst,dst,Imgproc.COLOR_RGB2GRAY);
 
         //Increasing the contrast of the image
-        src.convertTo(src, -1, 1.2, 50);
+        src.convertTo(src, -1, 1, 10);
 
         //Adding smoothing
-        Imgproc.medianBlur(src, edges, 19);
+        Imgproc.medianBlur(src, edges, 9);
         Imgproc.GaussianBlur(edges, edges, new Size(11, 11), 0);
 
         //Imgproc.GaussianBlur(gray, edges, new Size(11, 11), 0);
         
         //Detecting the edges
-        Imgproc.Canny(edges, edges, 4,12);
+        //Imgproc.Canny(edges, edges, 4,12);
+        Imgproc.Laplacian(edges, dst, CvType.CV_16S, 5, 0.6, 9, Core.BORDER_DEFAULT);
+
+        Mat image = new Mat();
+        
+        Core.convertScaleAbs(dst, image);
 
         //Copying the detected edges to the destination matrix
-        src.copyTo(dst, edges);    
+        //src.copyTo(dst, edges);  
+        Mat image2 = new Mat(src.rows(), src.cols(), src.type());
+
+        Core.addWeighted(image, 1.2, image2, -0.5, 0, image2);
 
         //Setting to greyscale.
-        Imgproc.threshold(dst, dst, 0, 1000, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(image2, image2, 20, 255, Imgproc.THRESH_BINARY_INV);
+
+        Imgproc.medianBlur(image2, image2, 9);
         
-        Imgcodecs.imwrite("IM000001_1_contrast_2.jpg",dst);
+        Imgcodecs.imwrite("IM000001_1_contrast_2.jpg",image2);
+
+
+        //opencv.laplacian
+
+        //CLAHE
 
         //Some code from this source
         //https://www.tutorialspoint.com/java-example-demonstrating-canny-edge-detection-in-opencv
-    }
 }
