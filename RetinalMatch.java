@@ -6,50 +6,63 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Size;
 
 public class RetinalMatch {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Mat src=Imgcodecs.imread("RIDB/RIDB/IM000001_2.jpg");
-        Mat dst=new Mat();
-        Mat gray = new Mat();
-        Mat edges = new Mat();
+        public static void main(String[] args) {
+                System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+                
+                //Get the image filenames to compare from the command line
+                String imagePath1 = args[0];
+                String imagePath2 = args[1];
 
-        Imgproc.cvtColor(src, src, Imgproc.COLOR_RGB2GRAY);
-        //Imgproc.cvtColor(dst,dst,Imgproc.COLOR_RGB2GRAY);
+                //Make MAT objects using these filenames
+                Mat image1 = Imgcodecs.imread(imagePath1);
+                Mat image2 = Imgcodecs.imread(imagePath2);
 
-        //Increasing the contrast of the image
-        src.convertTo(src, -1, 1, 10);
-
-        //Adding smoothing
-        Imgproc.medianBlur(src, edges, 9);
-        Imgproc.GaussianBlur(edges, edges, new Size(11, 11), 0);
-
-        //Imgproc.GaussianBlur(gray, edges, new Size(11, 11), 0);
+                //Clean up these images so that they can be compared
+                Mat cleanImage1 = cleanImage(image1);
+                Mat cleanImage2 = cleanImage(image2);
         
-        //Detecting the edges
-        //Imgproc.Canny(edges, edges, 4,12);
-        Imgproc.Laplacian(edges, dst, CvType.CV_16S, 5, 0.6, 9, Core.BORDER_DEFAULT);
+		//Show these images
+                Imgcodecs.imwrite("image1_output.jpg", cleanImage1);
+                Imgcodecs.imwrite("image2_output.jpg", cleanImage2);
+	}
 
-        Mat image = new Mat();
+        private static Mat cleanImage(Mat src)
+        {
+                Mat dst=new Mat();
+                Mat gray = new Mat();
+                Mat edges = new Mat();
+
+                Imgproc.cvtColor(src, src, Imgproc.COLOR_RGB2GRAY);
+                //Imgproc.cvtColor(dst,dst,Imgproc.COLOR_RGB2GRAY);
+
+                //Increasing the contrast of the image
+                src.convertTo(src, -1, 1, 10);
+
+                //Adding smoothing
+                Imgproc.medianBlur(src, edges, 9);
+                Imgproc.GaussianBlur(edges, edges, new Size(11, 11), 0);
+
+                //Imgproc.GaussianBlur(gray, edges, new Size(11, 11), 0);
         
-        Core.convertScaleAbs(dst, image);
+                //Detecting the edges
+                //Imgproc.Canny(edges, edges, 4,12);
+                Imgproc.Laplacian(edges, dst, CvType.CV_16S, 5, 0.6, 9, Core.BORDER_DEFAULT);
 
-        //Copying the detected edges to the destination matrix
-        //src.copyTo(dst, edges);  
-        Mat image2 = new Mat(src.rows(), src.cols(), src.type());
-
-        Core.addWeighted(image, 1.2, image2, -0.5, 0, image2);
-
-        //Setting to greyscale.
-        Imgproc.threshold(image2, image2, 20, 255, Imgproc.THRESH_BINARY_INV);
-
-        Imgproc.medianBlur(image2, image2, 9);
+                Mat image = new Mat();
         
-        Imgcodecs.imwrite("IM000001_1_contrast_2.jpg",image2);
+                Core.convertScaleAbs(dst, image);
 
+                //Copying the detected edges to the destination matrix
+                //src.copyTo(dst, edges);  
+                Mat image2 = new Mat(src.rows(), src.cols(), src.type());
 
-        //opencv.laplacian
+                Core.addWeighted(image, 1.2, image2, -0.5, 0, image2);
 
-        //CLAHE
+                //Setting to greyscale.
+                Imgproc.threshold(image2, image2, 20, 255, Imgproc.THRESH_BINARY_INV);
 
-        //Some code from this source
-        //https://www.tutorialspoint.com/java-example-demonstrating-canny-edge-detection-in-opencv
+                Imgproc.medianBlur(image2, image2, 9);
+
+                return image2;
+        }
 }
