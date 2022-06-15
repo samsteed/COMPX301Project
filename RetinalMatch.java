@@ -28,10 +28,10 @@ public class RetinalMatch {
                 Mat cleanImage2 = cleanImage(image2);
         
 		//Show these images
-                Imgcodecs.imwrite("image1_output.jpg", cleanImage1);
-                Imgcodecs.imwrite("image2_output.jpg", cleanImage2);
+                //Imgcodecs.imwrite("image1_output.jpg", cleanImage1);
+                //Imgcodecs.imwrite("image2_output.jpg", cleanImage2);
 
-                //Create the histograms
+                //Get the histogram data
                 List<Mat> bgrPlanes1 = new ArrayList<>();
                 List<Mat> bgrPlanes2 = new ArrayList<>();
                 Core.split(cleanImage1, bgrPlanes1);
@@ -57,7 +57,7 @@ public class RetinalMatch {
                 Core.normalize(histogramImage1, histogramImage1, 0, histImage1.rows(), Core.NORM_MINMAX);
                 Core.normalize(histogramImage2, histogramImage2, 0, histImage2.rows(), Core.NORM_MINMAX);
 
-                //Show the histograms
+                //Plot the histograms
                 float[] histogramImage1Data = new float[(int) (histogramImage1.total() * histogramImage1.channels())];
                 histogramImage1.get(0, 0, histogramImage1Data);
 
@@ -72,8 +72,8 @@ public class RetinalMatch {
                             new Point(binWidth * (i), histHeight - Math.round(histogramImage2Data[i])), new Scalar(255), 2);
                 }
 
-                Imgcodecs.imwrite("histogram1.jpg", histImage1);
-                Imgcodecs.imwrite("histogram2.jpg", histImage2);
+                //Imgcodecs.imwrite("histogram1.jpg", histImage1);
+                //Imgcodecs.imwrite("histogram2.jpg", histImage2);
 
                 histImage1.convertTo(histImage1, CvType.CV_32F);
                 histImage2.convertTo(histImage2, CvType.CV_32F);
