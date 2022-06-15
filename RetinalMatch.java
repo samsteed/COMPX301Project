@@ -31,12 +31,12 @@ public class RetinalMatch {
                 Imgcodecs.imwrite("image1_output.jpg", cleanImage1);
                 Imgcodecs.imwrite("image2_output.jpg", cleanImage2);
 
+                //Create the histograms
                 List<Mat> bgrPlanes1 = new ArrayList<>();
                 List<Mat> bgrPlanes2 = new ArrayList<>();
                 Core.split(cleanImage1, bgrPlanes1);
                 Core.split(cleanImage2, bgrPlanes2);
 
-                //Create the histograms
                 int histSize = 256;
                 float[] range = {0, 256}; //the upper boundary is exclusive
                 MatOfFloat histRange = new MatOfFloat(range);
@@ -75,8 +75,20 @@ public class RetinalMatch {
                 Imgcodecs.imwrite("histogram1.jpg", histImage1);
                 Imgcodecs.imwrite("histogram2.jpg", histImage2);
 
-                //Compare the difference of the normalized histograms
+                histImage1.convertTo(histImage1, CvType.CV_32F);
+                histImage2.convertTo(histImage2, CvType.CV_32F);
 
+                //Compare the difference of the normalized histograms
+                double correlation = Imgproc.compareHist(histImage1, histImage2, Imgproc.HISTCMP_CORREL);
+
+                if (correlation >= 0.99)
+                {
+                        System.out.println("1");
+                }
+                else
+                {
+                        System.out.println("0");
+                }
 	}
 
         private static Mat cleanImage(Mat src)
